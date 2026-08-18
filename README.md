@@ -20,13 +20,13 @@ pnpm preview
 
 ## Features
 
-- Strict 9-row Ã— 9-character text import, including CRLF support
-- Any character other than `1`â€“`9` represents an empty cell
-- Row, column, and 3 Ã— 3 box validation with useful error messages
+- Strict 9-row × 9-character text import, including CRLF support
+- Any character other than `1`–`9` represents an empty cell
+- Row, column, and 3 × 3 box validation with useful error messages
 - Constraint-based backtracking solver
 - No-solution, unique-solution, and multiple-solution detection
 - Explainable difficulty statistics and four rating bands
-- Unique puzzle generation with optional 180Â° rotational symmetry
+- Unique puzzle generation with optional 180° rotational symmetry
 - Approximate difficulty targeting
 - Browser UI for editing, importing, solving, rating, generating, and copying puzzles
 - Automated unit tests and GitHub Actions CI
@@ -48,11 +48,11 @@ The file must contain exactly nine lines of nine characters. Digits are clues; a
 78.....96
 ```
 
-Use the **Import a 9 Ã— 9 text file** control in the UI. The four assignment examples are also built in.
+Use the **Import a 9 × 9 text file** control in the UI. The four assignment examples are also built in.
 
 ## Design
 
-The engine in `src/sudoku.ts` has no UI dependencies. A board is a flat array of 81 integers: `0` means empty and `1`â€“`9` are values. A flat structure makes copying during search inexpensive and converts between index, row, and column with simple arithmetic.
+The engine in `src/sudoku.ts` has no UI dependencies. A board is a flat array of 81 integers: `0` means empty and `1`–`9` are values. A flat structure makes copying during search inexpensive and converts between index, row, and column with simple arithmetic.
 
 ### Solver and uniqueness
 
@@ -64,7 +64,7 @@ The search does not stop at its first completed board. It continues until it fin
 2. exactly one solution after exhausting the tree; or
 3. a second solution, at which point it stops because uniqueness has been disproved.
 
-Worst-case backtracking is exponential, but constraint propagation and the minimum-remaining-values heuristic make ordinary 9 Ã— 9 puzzles fast.
+Worst-case backtracking is exponential, but constraint propagation and the minimum-remaining-values heuristic make ordinary 9 × 9 puzzles fast.
 
 ### Difficulty model
 
@@ -73,16 +73,16 @@ Sudoku difficulty is subjective: it depends on which human techniques a solver k
 The solver records forced placements, branch points, failed branches, and visited search nodes. The score is:
 
 ```text
-25 Ã— guesses + 12 Ã— backtracks + 2 Ã— max(0, nodes - forced placements)
+25 × guesses + 12 × backtracks + 2 × max(0, nodes - forced placements)
 ```
 
 Rating thresholds:
 
 | Score | Rating |
 | ---: | --- |
-| 0â€“24 | Easy |
-| 25â€“149 | Medium |
-| 150â€“499 | Hard |
+| 0–24 | Easy |
+| 25–149 | Medium |
+| 150–499 | Hard |
 | 500+ | Samurai |
 
 The supplied example labels are reference points, but four examples are not enough to scientifically calibrate a model. A production version would add human-style strategies (hidden singles, pairs, pointing pairs, X-Wing) and calibrate weighted technique scores against a much larger labelled data set.
@@ -91,7 +91,7 @@ The supplied example labels are reference points, but four examples are not enou
 
 Generation starts with a complete random board produced by shuffled constraint search. It then removes clues in random order. After every removal, the solver verifies that exactly one solution remains; otherwise that clue is restored.
 
-With symmetry enabled, each position and its 180Â° partner are removed together. Generation targets a clue count associated with the requested difficulty and makes several attempts to obtain the requested measured rating. Because the rating is approximate, the UI reports both the requested and measured result.
+With symmetry enabled, each position and its 180° partner are removed together. Generation targets a clue count associated with the requested difficulty and makes several attempts to obtain the requested measured rating. Because the rating is approximate, the UI reports both the requested and measured result.
 
 ## Tests
 
@@ -117,7 +117,7 @@ OIDC avoids storing long-lived AWS access keys in GitHub.
 
 ### 2. Configure GitHub
 
-In **Settings â†’ Secrets and variables â†’ Actions**, add:
+In **Settings → Secrets and variables → Actions**, add:
 
 - Secret `AWS_DEPLOY_ROLE_ARN`: IAM role ARN
 - Variable `AWS_REGION`: for example `ca-central-1`
@@ -138,4 +138,3 @@ Create a `production` GitHub environment if deployment approvals are desired. Pu
 ## Interview talking points
 
 Be prepared to explain why uniqueness requires continued search after the first solution, how the candidate bit mask works, why minimum-remaining-values improves search, why clue count alone does not determine difficulty, and how restoring a removed clue preserves the generator's uniqueness invariant.
-
