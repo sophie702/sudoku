@@ -125,16 +125,3 @@ In **Settings → Secrets and variables → Actions**, add:
 - Optional variable `AWS_CLOUDFRONT_DISTRIBUTION_ID`
 
 Create a `production` GitHub environment if deployment approvals are desired. Push to `main` or run **Deploy to AWS** manually from the Actions tab.
-
-## What I would improve next
-
-- Implement a separate human-technique solver for more defensible ratings
-- Show candidates and a step-by-step explanation in the UI
-- Move difficult generation to a Web Worker to keep the UI responsive
-- Add property-based tests over thousands of generated puzzles
-- Add end-to-end browser tests and accessibility checks
-- Add a small CLI around the same framework-independent engine
-
-## Interview talking points
-
-Be prepared to explain why uniqueness requires continued search after the first solution, how the candidate bit mask works, why minimum-remaining-values improves search, why clue count alone does not determine difficulty, and how restoring a removed clue preserves the generator's uniqueness invariant.
