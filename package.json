@@ -10,7 +10,7 @@
     "preview": "vite preview --configLoader runner",
     "test": "vitest run --configLoader runner",
     "test:watch": "vitest --configLoader runner",
-    "check": "npm run test && npm run build"
+    "check": "vitest run --configLoader runner && tsc && vite build --configLoader runner"
   },
   "devDependencies": {
     "typescript": "^5.9.2",
