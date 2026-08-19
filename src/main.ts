@@ -144,11 +144,16 @@ document.querySelector('#generate')!.addEventListener('click', () => {
   button.disabled = true;
   button.textContent = 'Working…';
   window.setTimeout(() => {
-    setBoard(generate({ difficulty, symmetry }));
-    const analysis = solve(board);
-    show(`${difficulty} puzzle generated`, `Unique solution verified · measured ${analysis.difficulty} (score ${analysis.score}).`);
-    button.disabled = false;
-    button.textContent = 'Generate';
+    try {
+      setBoard(generate({ difficulty, symmetry }));
+      const analysis = solve(board);
+      show(`${difficulty} puzzle generated`, `Unique solution verified · measured ${analysis.difficulty} (score ${analysis.score}).`);
+    } catch (error) {
+      show('Generation did not reach the target', (error as Error).message, 'warn');
+    } finally {
+      button.disabled = false;
+      button.textContent = 'Generate';
+    }
   }, 20);
 });
 

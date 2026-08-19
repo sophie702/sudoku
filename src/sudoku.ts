@@ -192,37 +192,79 @@ const CLUE_TARGETS: Record<Difficulty, number> = {
   Samurai: 25,
 };
 
+const MAX_CLUES_FOR_RATING: Record<Difficulty, number> = {
+  Easy: 46,
+  Medium: 40,
+  Hard: 35,
+  Samurai: 30,
+};
+
+const DIFFICULTY_RANK: Record<Difficulty, number> = {
+  Easy: 0,
+  Medium: 1,
+  Hard: 2,
+  Samurai: 3,
+};
+
+const MINIMUM_CLUES = 17;
+
 export function generate(options: GenerateOptions = {}): Board {
   const difficulty = options.difficulty ?? 'Medium';
   const random = options.random ?? Math.random;
   const symmetry = options.symmetry ?? true;
   const target = CLUE_TARGETS[difficulty];
-  const maxAttempts = options.maxAttempts ?? 4;
-  let best: Board | null = null;
+  const maxAttempts = options.maxAttempts ?? 20;
+  const targetRank = DIFFICULTY_RANK[difficulty];
 
   for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     const completed = createCompletedBoard(random);
     const puzzle = [...completed];
     const positions = shuffle(Array.from({ length: symmetry ? 41 : 81 }, (_, index) => index), random);
+    let exactCandidate: Board | null = null;
+    let exactCandidateDistance = Number.POSITIVE_INFINITY;
 
     for (const position of positions) {
-      if (puzzle.filter(Boolean).length <= target) break;
       const pair = symmetry ? CELL_COUNT - 1 - position : position;
       const previous = puzzle[position]!;
       const previousPair = puzzle[pair]!;
       puzzle[position] = 0;
       puzzle[pair] = 0;
-      if (puzzle.filter(Boolean).length < target || solve(puzzle).status !== 'unique') {
+
+      const clueCount = puzzle.filter(Boolean).length;
+      if (clueCount < MINIMUM_CLUES) {
         puzzle[position] = previous;
         puzzle[pair] = previousPair;
+        continue;
+      }
+
+      const analysis = solve(puzzle);
+      const measuredDifficulty = analysis.difficulty;
+      if (
+        analysis.status !== 'unique' ||
+        measuredDifficulty === null ||
+        DIFFICULTY_RANK[measuredDifficulty] > targetRank
+      ) {
+        puzzle[position] = previous;
+        puzzle[pair] = previousPair;
+        continue;
+      }
+
+      if (measuredDifficulty === difficulty && clueCount <= MAX_CLUES_FOR_RATING[difficulty]) {
+        const distance = Math.abs(clueCount - target);
+        if (distance < exactCandidateDistance) {
+          exactCandidate = [...puzzle];
+          exactCandidateDistance = distance;
+        }
+        if (clueCount <= target) return [...puzzle];
       }
     }
 
-    best = puzzle;
-    const rating = solve(puzzle).difficulty;
-    if (rating === difficulty) return puzzle;
+    if (exactCandidate) return exactCandidate;
   }
-  return best!;
+
+  throw new Error(
+    `Unable to generate an exact ${difficulty} puzzle after ${maxAttempts} attempts. Please try again.`,
+  );
 }
 
 function createCompletedBoard(random: () => number): Board {

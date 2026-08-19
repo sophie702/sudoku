@@ -66,9 +66,17 @@ describe('generator', () => {
       return state / 2 ** 32;
     };
     const puzzle = generate({ difficulty: 'Easy', symmetry: true, random, maxAttempts: 1 });
-    expect(solve(puzzle).status).toBe('unique');
+    const analysis = solve(puzzle);
+    expect(analysis.status).toBe('unique');
+    expect(analysis.difficulty).toBe('Easy');
     for (let index = 0; index < 81; index += 1) {
       expect(Boolean(puzzle[index])).toBe(Boolean(puzzle[80 - index]));
     }
+  });
+
+  it('fails explicitly instead of returning a puzzle with the wrong difficulty', () => {
+    expect(() => generate({ difficulty: 'Hard', maxAttempts: 0 })).toThrow(
+      'Unable to generate an exact Hard puzzle',
+    );
   });
 });

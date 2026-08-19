@@ -89,9 +89,9 @@ The supplied example labels are reference points, but four examples are not enou
 
 ### Generator
 
-Generation starts with a complete random board produced by shuffled constraint search. It then removes clues in random order. After every removal, the solver verifies that exactly one solution remains; otherwise that clue is restored.
+Generation starts with a complete random board produced by shuffled constraint search. It then removes clues in random order. After every removal, the solver verifies that exactly one solution remains; otherwise that clue is restored. The same analysis also measures difficulty after every accepted removal. A removal that overshoots the requested difficulty is restored, while exact matches are retained as candidates.
 
-With symmetry enabled, each position and its 180° partner are removed together. Generation targets a clue count associated with the requested difficulty and makes several attempts to obtain the requested measured rating. Because the rating is approximate, the UI reports both the requested and measured result.
+With symmetry enabled, each position and its 180° partner are removed together. Clue count guides the search but does not define difficulty. The generator returns only a uniquely solvable puzzle whose measured rating exactly matches the requested rating. If it cannot find one within the configured attempt limit, it reports failure instead of returning a mislabeled puzzle. The rating remains a computational approximation of human difficulty.
 
 ## Tests
 
